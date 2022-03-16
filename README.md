@@ -14,7 +14,7 @@ This flow has a few pros and cons. On the plus side:
 - It follows a template, so that new flows can be created simply by copying the existing boilerplate and focusing on the logic of the flow.
 - Deploying is done through the github actions file, no custom python code necessary.
 - Flows are registered in parallel.
-- It is possible to redeploy all flows, which will rebuild and potentially update the docker images - a big security win.
+- It is easy to redeploy all flows at once, which will rebuild and potentially update the docker images - a big security win.
 
 On the minus side:
 - Although the github actions file is fairly short, it contains a few bits that are hard to read.

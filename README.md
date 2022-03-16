@@ -23,4 +23,4 @@ On the minus side:
 
 This particular example does not contain dev/test/prod references. For users with different tenants, it is possible to create several github action files triggering on different branches. For single-tenant users, it is possible repurpose the projects to reflect dev/test/prod environments. Once again, different github actions would trigger on different branches.
 
-So far, there is only one trigger: `workflow_dispatch` - meaning that we have to trigger it manually. Ideally, we might want to trigger it periodically, rebuilding and updating the images regularaly. This would reregister the flow, which seems to increment the flow version even though nothing has changed.
+In this example, there is only one trigger: `workflow_dispatch` - meaning that we have to trigger it manually. In most scenarios, we might want to trigger it both on merges and periodically, rebuilding and updating the images regularaly. This would reregister the flow, which seems to increment the flow version even though nothing has changed.

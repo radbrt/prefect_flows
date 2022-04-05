@@ -16,6 +16,7 @@ def check_db_quality():
     create_markdown_artifact(
         f"""
         # Sample Artifact
+        
         The randomly generated value is {random.random()}
 
         Generated at {datetime.datetime.utcnow().isoformat()}

@@ -1,0 +1,49 @@
+name: Register flows on merge dev
+on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed
+ 
+jobs:
+  create-matrix:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: echo "::set-output name=matrix::$(find projects/ -maxdepth 2 -mindepth 2 | grep "${{ github.event.inputs.pattern }}" | jq -Rsc '. / "\n" - [""]')"
+  register-flows:
+    if: github.event.pull_request.merged == true
+    env:
+      env: dev
+    needs: create-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flow-folder: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
+      max-parallel: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: setup python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9.x'
+      - name: Check python version
+        run: echo $(python --version)
+      - name: install prefect
+        run: pip install prefect
+      - name: install dependencies
+        working-directory: ${{ matrix.flow-folder }}
+        run: pip install -r requirements.txt
+      - name: prefect login
+        run: prefect auth login -k ${{ secrets.P_KEY }}
+      - name: docker login
+        run: docker login ${{ secrets.D_REGISTRY }} -u ${{ secrets.D_USER }} -p ${{ secrets.D_PASSWORD }}
+      - name: register flows
+        working-directory: ${{ matrix.flow-folder }}
+        run: prefect register --project $(echo "${{ matrix.flow-folder }}" | cut -d '/' -f2) --path ./ 

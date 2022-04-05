@@ -41,9 +41,9 @@ jobs:
         working-directory: ${{ matrix.flow-folder }}
         run: pip install -r requirements.txt
       - name: prefect login
-        run: prefect auth login -k ${{ secrets.P_KEY }}
+        run: prefect auth login -k ${{ secrets.PREFECT_CLOUD_KEY }}
       - name: docker login
-        run: docker login ${{ secrets.D_REGISTRY }} -u ${{ secrets.D_USER }} -p ${{ secrets.D_PASSWORD }}
+        run: docker login ${{ secrets.DOCKER_REGISTRY }} -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: register flows
         working-directory: ${{ matrix.flow-folder }}
         run: prefect register --project $(echo "${{ matrix.flow-folder }}" | cut -d '/' -f2) --path ./ 

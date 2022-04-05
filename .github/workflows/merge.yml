@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(find projects/ -maxdepth 2 -mindepth 2 | grep "${{ github.event.inputs.pattern }}" | jq -Rsc '. / "\n" - [""]')"
+        run: echo "::set-output name=matrix::$(find projects/ -maxdepth 2 -mindepth 2 | jq -Rsc '. / "\n" - [""]')"
   register-flows:
     if: github.event.pull_request.merged == true
     env:

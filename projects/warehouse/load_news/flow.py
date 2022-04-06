@@ -30,6 +30,7 @@ def save_frontpage():
 
 dockerstore = Docker(
     image_name='aftenposten_feed_flow',
+    image_tag='dev',
     registry_url='radbrt.azurecr.io',
     dockerfile='Dockerfile'
 )

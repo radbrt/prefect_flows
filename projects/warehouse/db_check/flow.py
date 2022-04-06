@@ -23,7 +23,8 @@ def check_db_quality():
         """)
 
 dockerstore = Docker(
-    image_name='db_check',
+    image_name='db_check_quality',
+    image_tag='dev',
     registry_url='radbrt.azurecr.io',
     dockerfile='Dockerfile'
 )

@@ -12,6 +12,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import feedparser
 from google.oauth2 import service_account
 import datetime
+from prefect.schedules import IntervalSchedule
 
 @task()
 def save_frontpage():
@@ -49,7 +50,12 @@ dockerstore = Docker(
     dockerfile='Dockerfile'
 )
 
-with Flow("nrk_feed_flow", storage=dockerstore) as flow:
+nrk_schedule = IntervalSchedule(
+    start_date=datetime.datetime.utcnow(),
+    interval=datetime.timedelta(minutes=60)
+)
+
+with Flow("nrk_feed_flow", storage=dockerstore, schedule=nrk_schedule) as flow:
     save_frontpage()
 
 flow.run_config = KubernetesRun(labels=["aks", "cerxkube"])

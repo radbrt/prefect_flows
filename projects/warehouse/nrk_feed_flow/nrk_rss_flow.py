@@ -44,12 +44,13 @@ def save_frontpage():
 
 dockerstore = Docker(
     image_name='nrk_feed_flow',
-    registry_url='radbrt.azurecr.io',
+    image_tag='latest',
+    registry_url='cocerxkubecr.azurecr.io',
     dockerfile='Dockerfile'
 )
 
 with Flow("nrk_feed_flow", storage=dockerstore) as flow:
     save_frontpage()
 
-flow.run_config = KubernetesRun(labels=["aks"])
+flow.run_config = KubernetesRun(labels=["aks", "cerxkube"])
 flow.executor = LocalDaskExecutor()

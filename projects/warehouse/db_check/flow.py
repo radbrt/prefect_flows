@@ -24,8 +24,8 @@ def check_db_quality():
 
 dockerstore = Docker(
     image_name='db_check_quality',
-    image_tag='dev',
-    registry_url='radbrt.azurecr.io',
+    image_tag='latest',
+    registry_url='cocerxkubecr.azurecr.io',
     dockerfile='Dockerfile'
 )
 

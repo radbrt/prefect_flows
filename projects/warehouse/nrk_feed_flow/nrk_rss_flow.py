@@ -2,7 +2,7 @@ from prefect import task, Flow
 from prefect.executors import LocalDaskExecutor
 from prefect.run_configs import KubernetesRun
 # from prefect.tasks.dbt import dbt
-from prefect.tasks.secrets import PrefectSecret
+# from prefect.tasks.secrets import PrefectSecret
 from prefect.client.secrets import Secret
 from prefect.storage import Docker
 import prefect
@@ -15,22 +15,25 @@ import datetime
 from prefect.schedules import IntervalSchedule
 
 @task()
-def save_frontpage():
-    gcp_key = PrefectSecret("GCP-KEY").run()
+def save_frontpage(df, creds):
+    df.to_gbq("radwarehouse.staging.nrk_frontpage", "radwarehouse", if_exists='append', credentials=creds)
 
-    URL = 'https://www.nrk.no/nyheter/siste.rss'
+
+@task
+def get_credentials(gcp_key):
+    credentials = service_account.Credentials.from_service_account_info(gcp_key)
+    return credentials
+
+
+@task
+def read_rss(URL):
     nrk_rss = feedparser.parse(URL)
     rss_entries_string = json.dumps(nrk_rss['entries'])
     rss_entries_json = json.loads(rss_entries_string)
-
-    logger = prefect.context.get('logger')
-    logger.info(f"gcp_key is of type: f{type(gcp_key)}")
-
-    credentials = service_account.Credentials.from_service_account_info(gcp_key)
     df = pd.DataFrame(rss_entries_json, dtype='str')
     df['loaded_at'] = datetime.datetime.utcnow()
 
-    df.to_gbq("radwarehouse.staging.nrk_frontpage", "radwarehouse", if_exists='append', credentials=credentials)
+    return df
 
 
 # @task()
@@ -43,20 +46,27 @@ def save_frontpage():
 #                                 )
 
 
-dockerstore = Docker(
+
+with Flow("nrk_feed_flow", storage=dockerstore, schedule=nrk_schedule) as flow:
+    gcp_key = Secret.get("GCP-KEY")
+    URL = 'https://www.nrk.no/nyheter/siste.rss'
+
+    creds = get_credentials(gcp_key)
+    rss_df = read_rss(URL)
+    save_frontpage(rss_df, creds)
+
+
+flow.storage = Docker(
     image_name='nrk_feed_flow',
     image_tag='latest',
     registry_url='cocerxkubecr.azurecr.io',
     dockerfile='Dockerfile'
 )
 
-nrk_schedule = IntervalSchedule(
+flow.schedule = IntervalSchedule(
     start_date=datetime.datetime.utcnow(),
     interval=datetime.timedelta(minutes=60)
 )
-
-with Flow("nrk_feed_flow", storage=dockerstore, schedule=nrk_schedule) as flow:
-    save_frontpage()
 
 flow.run_config = KubernetesRun(labels=["aks", "cerxkube"])
 flow.executor = LocalDaskExecutor()

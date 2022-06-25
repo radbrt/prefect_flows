@@ -3,13 +3,14 @@ from pathlib import Path
 import requests
 from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient, BlobClient
 from prefect.storage import Docker
 from prefect import task, Flow, Parameter
 from prefect.executors import LocalExecutor
 from prefect.run_configs import KubernetesRun
 
 import datetime
-from azure.storage.blob import BlobServiceClient, BlobClient
+
 
 
 def get_secret(secret_name):
@@ -32,7 +33,7 @@ def save_file_to_storage(prefix, url):
     container_client = service.get_container_client("enhetsregisteret")
     blob = BlobClient(account_url=f"https://radlake.blob.core.windows.net/", container_name="enhetsregisteret", blob_name="testfile.txt", credential=credential)
     blob_client = container_client.get_blob_client(filename)
-    r = requests.get(url, preload_content=False).raw.read()
+    r = requests.get(url).raw.read()
     blob_client.upload_blob(r, blob_type="BlockBlob")
 
     return filename

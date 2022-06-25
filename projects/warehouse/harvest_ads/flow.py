@@ -14,6 +14,8 @@ from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
 from prefect.tasks.secrets import PrefectSecret
 from prefect.backend import kv_store
+from time import sleep
+import random
 
 
 def get_secret(secret_name):
@@ -46,10 +48,10 @@ def save_ads(ads_list):
 @task
 def initiate_harvest(endpoint, token, headers):
 
-    last_run = kv_store.get_key_value('HARVEST_ADS_HW')
+    last_run = kv_store.get_key_value('last_ads_run')
     endtime = "*"
 
-    args = f"size=100&published=%5B{start_isotime}%2C{endtime}%5D"
+    args = f"size=100&published=%5B{last_run}%2C{endtime}%5D"
 
     curpage = 0
     r = requests.get(f"{ENDPOINT}?{args}&page={curpage}", headers=HEADERS)
@@ -58,13 +60,14 @@ def initiate_harvest(endpoint, token, headers):
     maxpage = ads['totalPages']
     save_ads.run(ads)
 
-
     url_calls = [requests.Request('GET', f"{ENDPOINT}?{args}&page={curpage}", headers=HEADERS) for curpage in range(2, maxpage+1)]
     return url_calls
 
 
 @task
 def additional_page(req):
+    sleep(random.random()*10)
+
     prepped_req = req.prepare()
     s = requests.Session()
     response = s.send(prepped_req)
@@ -88,8 +91,8 @@ def insert_ads(adsarray, db_table):
 
 
 @task
-def update_hw(x):
-    kv_store.set_key_value()
+def update_hw(start_time, x):
+    kv_store.set_key_value('last_ads_run', start_time)
 
 
 with Flow("Harvest ads") as flow:

@@ -46,7 +46,8 @@ def save_ads(ads_list):
 
 
 @task
-def initiate_harvest(endpoint, token, headers):
+def initiate_harvest(endpoint, token):
+    HEADERS = {"accept": "application/json", "Authorization": f"Bearer {token}"}
 
     last_run = kv_store.get_key_value('last_ads_run')
     endtime = "*"
@@ -54,13 +55,15 @@ def initiate_harvest(endpoint, token, headers):
     args = f"size=100&published=%5B{last_run}%2C{endtime}%5D"
 
     curpage = 0
-    r = requests.get(f"{ENDPOINT}?{args}&page={curpage}", headers=HEADERS)
+    full_url = f"{endpoint}?{args}&page={curpage}"
+    r = requests.get(full_url, headers=HEADERS)
 
+    print(r.status_code)
     ads = json.loads(r.text)
     maxpage = ads['totalPages']
     save_ads.run(ads)
 
-    url_calls = [requests.Request('GET', f"{ENDPOINT}?{args}&page={curpage}", headers=HEADERS) for curpage in range(2, maxpage+1)]
+    url_calls = [requests.Request('GET', f"{endpoint}?{args}&page={curpage}", headers=HEADERS) for curpage in range(1, maxpage+1)]
     return url_calls
 
 
@@ -99,16 +102,15 @@ with Flow("Harvest ads") as flow:
 
     ENDPOINT = 'https://arbeidsplassen.nav.no/public-feed/api/v1/ads'
     TOKEN = PrefectSecret('NAV_TOKEN')
-    HEADERS = {"accept": "application/json", "Authorization": f"Bearer {TOKEN}"}
     start_time = datetime.today().isoformat(timespec='seconds')
 
-    additional_jobs = initiate_harvest(ENDPOINT, TOKEN, HEADERS)
+    additional_jobs = initiate_harvest(ENDPOINT, TOKEN)
     additional_results = additional_page.map(additional_jobs)
     update_hw(start_time, additional_results)
 
 
 
-flow.run_config = KubernetesRun(labels='aks')
+flow.run_config = KubernetesRun(labels=['aks'])
 
 flow.executor = LocalExecutor()
 
@@ -120,7 +122,7 @@ flow.storage = Docker(
 )
 
 # M H DOM M DOW
-flow.schedule = CronSchedule('30 02 * * *', start_date=datetime.now())
+# flow.schedule = CronSchedule('30 02 * * *', start_date=datetime.now())
 
 if __name__ == '__main__':
     flow.run()

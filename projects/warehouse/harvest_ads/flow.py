@@ -122,7 +122,7 @@ flow.storage = Docker(
 )
 
 # M H DOM M DOW
-# flow.schedule = CronSchedule('30 02 * * *', start_date=datetime.now())
+flow.schedule = CronSchedule('30 02 * * *', start_date=datetime.now())
 
 if __name__ == '__main__':
     flow.run()

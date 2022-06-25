@@ -1,4 +1,4 @@
 prefect[azure]
 azure-identity
 azure-keyvault-secrets
-azure-storage
+azure-storage-blob

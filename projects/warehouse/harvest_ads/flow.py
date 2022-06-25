@@ -1,3 +1,4 @@
+from turtle import update
 import pymongo
 import time
 import json
@@ -12,7 +13,7 @@ import base64
 from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
 from prefect.tasks.secrets import PrefectSecret
-
+from prefect.backend import kv_store
 
 
 def get_secret(secret_name):
@@ -45,9 +46,7 @@ def save_ads(ads_list):
 @task
 def initiate_harvest(endpoint, token, headers):
 
-
-    last_run = datetime.today() - timedelta(days=1, minutes=3)
-    start_isotime = last_run.isoformat(timespec='seconds')
+    last_run = kv_store.get_key_value('HARVEST_ADS_HW')
     endtime = "*"
 
     args = f"size=100&published=%5B{start_isotime}%2C{endtime}%5D"
@@ -88,14 +87,23 @@ def insert_ads(adsarray, db_table):
     return(insert_attempts, errors)
 
 
+@task
+def update_hw(x):
+    kv_store.set_key_value()
+
+
 with Flow("Harvest ads") as flow:
 
     ENDPOINT = 'https://arbeidsplassen.nav.no/public-feed/api/v1/ads'
     TOKEN = PrefectSecret('NAV_TOKEN')
     HEADERS = {"accept": "application/json", "Authorization": f"Bearer {TOKEN}"}
-    
+    start_time = datetime.today().isoformat(timespec='seconds')
+
     additional_jobs = initiate_harvest(ENDPOINT, TOKEN, HEADERS)
     additional_results = additional_page.map(additional_jobs)
+    update_hw(start_time, additional_results)
+
+
 
 flow.run_config = KubernetesRun(labels='aks')
 
@@ -103,7 +111,7 @@ flow.executor = LocalExecutor()
 
 flow.storage = Docker(
     registry_url='cocerxkubecr.azurecr.io',
-    image_name='save_enhetsregisteret',
+    image_name='harvest_ads',
     image_tag='latest',
     dockerfile='Dockerfile'
 )

@@ -1,4 +1,5 @@
 from pathlib import Path
+from this import s
 
 import requests
 from azure.keyvault.secrets import SecretClient
@@ -8,7 +9,7 @@ from prefect.storage import Docker
 from prefect import task, Flow, Parameter
 from prefect.executors import LocalExecutor
 from prefect.run_configs import KubernetesRun
-
+from prefect.schedules import CronSchedule
 import datetime
 
 
@@ -55,7 +56,7 @@ with Flow("Save Enhetsregisteret") as flow:
     process_single_file.map(urls)
 
 
-flow.run_config = KubernetesRun()
+flow.run_config = KubernetesRun(labels='aks')
 
 flow.executor = LocalExecutor()
 
@@ -65,6 +66,9 @@ flow.storage = Docker(
     image_tag='latest',
     dockerfile='Dockerfile'
 )
+
+# M H DOM M DOW
+flow.schedule = CronSchedule('15 04 * * 6', start_date=datetime.datetime.now())
 
 if __name__ == '__main__':
     flow.run()

@@ -24,8 +24,7 @@ def get_secret(secret_name):
 
 
 def save_file_to_storage(prefix, url):
-    filename = 'foretak' + str(datetime.date.today()) + ".json"
-    storage_account = "radlake"
+    filename = f"{prefix}/{str(datetime.date.today())}.json"
 
     credential = DefaultAzureCredential()
     service = BlobServiceClient(account_url=f"https://radlake.blob.core.windows.net/", credential=credential)

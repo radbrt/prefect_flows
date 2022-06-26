@@ -1,0 +1,5 @@
+{
+    "flow_name": null,
+    "project": null,
+    "flow_slug": "{{ cookiecutter.flow_name.lower().replace(' ', '_') }}"
+}

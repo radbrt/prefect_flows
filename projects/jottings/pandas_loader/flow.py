@@ -26,7 +26,7 @@ def query_snowflake(table_name, creds):
         from {table_name};
     """
 
-    constring = f"snowflake://{username}:{password}@{account}/{db}?warehouse={warehouse}&role={role}"
+    constring = f"snowflake://{username}:{password}@{account}/?warehouse={warehouse}&role={role}"
     con = create_engine(constring)
 
     df = pd.read_sql(table_name, con=con)
@@ -51,7 +51,7 @@ def write_to_pg(df, to_table, pg_creds):
     return sum_value
 
 
-with Flow("Dask Loader") as flow:
+with Flow("Pandas Loader") as flow:
     table_name = Parameter('table_name', default='ECONOMY_DATA_ATLAS.ECONOMY.DATASETS')
     to_table = Parameter('to_table', default='dask_target6')
     creds = PrefectSecret('SNOWFLAKE_CREDS')

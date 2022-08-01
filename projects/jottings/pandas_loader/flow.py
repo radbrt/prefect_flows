@@ -20,11 +20,11 @@ def query_snowflake(table_name, creds):
     role = creds["ROLE"]
     db = "ECONOMY_DATA_ATLAS"
     schema = "ECONOMY"
-    table_name = "DATASETS"
+    # table_name = "DATASETS"
 
     constring = f"snowflake://{username}:{password}@{account}/?database={db}&warehouse={warehouse}&role={role}&schema={schema}"
     con = create_engine(constring)
-    
+
     df = pd.read_sql_table(table_name, con=con)
 
     return df

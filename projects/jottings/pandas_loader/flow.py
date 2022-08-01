@@ -18,18 +18,14 @@ def query_snowflake(table_name, creds):
     account = creds["ACCOUNT"]
     warehouse = creds["WAREHOUSE"]
     role = creds["ROLE"]
-    db = "DBTHOUSE"
-    schema = "DEVELOP"
+    db = "ECONOMY_DATA_ATLAS"
+    schema = "ECONOMY"
+    table_name = "DATASETS"
 
-    example_query = f"""
-        select *
-        from {table_name};
-    """
-
-    constring = f"snowflake://{username}:{password}@{account}"
+    constring = f"snowflake://{username}:{password}@{account}/?database={db}&warehouse={warehouse}&role={role}&schema={schema}"
     con = create_engine(constring)
-
-    df = pd.read_sql(table_name, con=con)
+    
+    df = pd.read_sql_table(table_name, con=con)
 
     return df
 

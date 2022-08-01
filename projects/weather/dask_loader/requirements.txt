@@ -1,0 +1,10 @@
+prefect[azure]
+azure-identity
+azure-keyvault-secrets
+azure-storage-blob
+dask
+distributed
+dask-snowflake
+sqlalchemy
+psycopg2
+dask-kubernetes

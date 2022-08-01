@@ -37,8 +37,6 @@ jobs:
           python-version: '3.9.x'
       - name: Check python version
         run: echo $(python --version)
-      - name: install prefect
-        run: pip install prefect
       - name: install dependencies
         working-directory: ${{ matrix.flow-folder }}
         run: pip install -r requirements.txt

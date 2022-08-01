@@ -1,4 +1,4 @@
-prefect[azure]
+prefect[azure]==1.2.4
 azure-identity
 azure-keyvault-secrets
 azure-storage-blob

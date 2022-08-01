@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 import datetime
 
 
-
 @task()
 def query_snowflake(table_name, creds):
     logger = prefect.context.get('logger')
@@ -21,11 +20,14 @@ def query_snowflake(table_name, creds):
     db = "ECONOMY_DATA_ATLAS"
     schema = "ECONOMY"
     # table_name = "DATASETS"
+    query = f"""
+    SELECT * FROM {schema}.{table_name};
+    """
 
-    constring = f"snowflake://{username}:{password}@{account}/?database={db}&warehouse={warehouse}&role={role}&schema={schema}"
+    constring = f"snowflake://{username}:{password}@{account}/?database={db}&warehouse={warehouse}&role={role}"
     con = create_engine(constring)
 
-    df = pd.read_sql_table(table_name, con=con)
+    df = pd.read_sql(query, con=con)
 
     return df
 

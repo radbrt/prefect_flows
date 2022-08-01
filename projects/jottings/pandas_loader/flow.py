@@ -26,7 +26,7 @@ def query_snowflake(table_name, creds):
         from {table_name};
     """
 
-    constring = f"snowflake://{username}:{password}@{account}/?warehouse={warehouse}&role={role}"
+    constring = f"snowflake://{username}:{password}@{account}"
     con = create_engine(constring)
 
     df = pd.read_sql(table_name, con=con)

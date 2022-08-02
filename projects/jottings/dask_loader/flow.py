@@ -20,12 +20,12 @@ def query_snowflake(table_name, creds):
     account = creds["ACCOUNT"]
     warehouse = creds["WAREHOUSE"]
     role = creds["ROLE"]
-    db = "DBTHOUSE"
-    schema = "DEVELOP"
+    db = "ECONOMY_DATA_ATLAS"
+    schema = "ECONOMY"
 
     example_query = f"""
         select *
-        from {table_name};
+        from {db}.{schema}.{table_name};
     """
 
     ddf = read_snowflake(
@@ -49,7 +49,7 @@ def write_to_pg(df, to_table, pg_creds):
 
     connstring = f"postgresql+psycopg2://{username}:{password}@{host}:5432/postgres?sslmode=require"
 
-    df.to_sql(name=to_table, uri=connstring)
+    df.to_sql(name=to_table, uri=connstring, chunksize=10000, if_exists="replace")
 
     logger = prefect.context.get('logger')
     logger.info(df.dtypes)
@@ -59,7 +59,7 @@ def write_to_pg(df, to_table, pg_creds):
 
 
 with Flow("Dask Loader") as flow:
-    table_name = Parameter('table_name', default='ECONOMY_DATA_ATLAS.ECONOMY.DATASETS')
+    table_name = Parameter('table_name', default='DATASETS')
     to_table = Parameter('to_table', default='dask_target6')
     creds = PrefectSecret('SNOWFLAKE_CREDS')
     pg_creds = PrefectSecret('PG_CREDS')

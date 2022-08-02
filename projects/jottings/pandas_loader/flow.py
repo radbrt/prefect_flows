@@ -40,17 +40,17 @@ def write_to_pg(df, to_table, pg_creds):
 
     connstring = f"postgresql+psycopg2://{username}:{password}@{host}:5432/postgres?sslmode=require"
     con = create_engine(connstring)
-    df.to_sql(name=to_table, con=con)
+    df.to_sql(name=to_table, con=con, if_exists="replace")
 
     logger = prefect.context.get('logger')
     logger.info(df.dtypes)
-    sum_value = df.count().compute()
+    sum_value = df.count()
     logger.info(f"Counted {sum_value} rows")
     return sum_value
 
 
 with Flow("Pandas Loader") as flow:
-    table_name = Parameter('table_name', default='ECONOMY_DATA_ATLAS.ECONOMY.DATASETS')
+    table_name = Parameter('table_name', default='DATASETS')
     to_table = Parameter('to_table', default='dask_target6')
     creds = PrefectSecret('SNOWFLAKE_CREDS')
     pg_creds = PrefectSecret('PG_CREDS')

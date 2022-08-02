@@ -36,7 +36,7 @@ def query_snowflake(table_name, creds):
             "account": account,
             "warehouse": warehouse
         },
-    )
+    ).repartition(partition_size='100MB')
 
     return ddf
 

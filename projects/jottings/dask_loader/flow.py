@@ -52,6 +52,7 @@ def write_to_pg(df, to_table, pg_creds):
     df.to_sql(name=to_table, uri=connstring, chunksize=10000, if_exists="replace")
 
     logger = prefect.context.get('logger')
+    logger.info(pg_creds)
     logger.info(df.dtypes)
     sum_value = df.count().compute()
     logger.info(f"Counted {sum_value} rows")

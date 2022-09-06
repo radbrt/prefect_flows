@@ -27,6 +27,7 @@ plugins:
       value: '2010-01-01T00:00:00Z'
     config:
       # Configured values:
+      host: cocerxsftp.blob.core.windows.net
       port: 22
       start_date: 2021-01-28
       tables:

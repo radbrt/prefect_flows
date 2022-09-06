@@ -5,19 +5,24 @@ from prefect.tasks.shell import ShellTask
 from prefect.executors import LocalExecutor
 from prefect.run_configs import KubernetesRun
 from prefect.storage import Docker
-
+import prefect
 
 @task
 def run_el():
+    logger = prefect.context.get("logger")
+
 
     tap_sftp_config = PrefectSecret("TAP_SFTP_CONFIG").run()
-    
+
+    logger.info(tap_sftp_config.keys())
+    logger.info(tap_sftp_config["TAP_SFTP_HOST"])
+
     s = ShellTask(command="meltano elt tap-sftp target-jsonl", 
         env={
             "TAP_SFTP_PASSWORD": tap_sftp_config["TAP_SFTP_PASSWORD"],
             "TAP_SFTP_USERNAME": tap_sftp_config["TAP_SFTP_USERNAME"],
             "TAP_SFTP_HOST": tap_sftp_config["TAP_SFTP_HOST"],
-            # "MELTANO_DATABASE_URI": PrefectSecret("MELTANO_DATABASE_URI"),
+            # "MELTANO_DATABASE_URI": PrefectSecret("MELTANO_DATABASE_URI").run(),
             }, 
         helper_script="cd /el", 
         shell="bash", 

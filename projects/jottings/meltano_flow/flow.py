@@ -18,8 +18,8 @@ def run_el():
     logger.info(tap_sftp_config["TAP_SFTP_HOST"])
 
     s = ShellTask(
-        #command="meltano elt tap-sftp target-jsonl",
-        command="echo $TAP_SFTP_HOST",
+        command="meltano elt tap-sftp target-jsonl",
+        # command="echo $TAP_SFTP_HOST",
         helper_script="cd /el", 
         shell="bash", 
         return_all=True, 

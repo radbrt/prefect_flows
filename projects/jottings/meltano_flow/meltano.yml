@@ -1,0 +1,42 @@
+version: 1
+default_environment: dev
+environments:
+- name: dev
+- name: staging
+- name: prod
+project_id: 96c9c843-b3fd-44aa-bd6d-cd85306f0df2
+plugins:
+  extractors:
+  # Insert a new entry:
+  - name: tap-sftp
+    namespace: tap_sftp
+    pip_url: -e ./tap-sftp
+    executable: tap-sftp
+    capabilities:
+      # For a reference of plugin capabilities, see:
+      # https://docs.meltano.com/reference/plugin-definition-syntax#capabilities
+    - state
+    - catalog
+    - discover
+    settings:
+    - name: username
+    - name: password
+      kind: password
+    - name: start_date
+        # Default value for the plugin:
+      value: '2010-01-01T00:00:00Z'
+    config:
+      # Configured values:
+      port: 22
+      start_date: 2021-01-28
+      tables:
+      - table_name: customers
+        search_prefix: ''
+        search_pattern: customers_.*
+        key_properties: [key]
+        delimiter: ','
+        encoding: utf-8
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl

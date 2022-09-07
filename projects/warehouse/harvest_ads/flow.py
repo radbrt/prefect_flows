@@ -68,8 +68,9 @@ def initiate_harvest(endpoint, token):
 
     print(r.status_code)
     ads = json.loads(r.text)
+    ads_content = ads["content"]
     maxpage = ads['totalPages']
-    save_ads.run(ads)
+    save_ads.run(ads_content)
 
     url_calls = [requests.Request('GET', f"{endpoint}?{args}&page={curpage}", headers=HEADERS) for curpage in range(1, maxpage+1)]
     return url_calls

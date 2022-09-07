@@ -1,4 +1,3 @@
-from turtle import update
 import pymongo
 import time
 import json
@@ -9,7 +8,7 @@ from prefect import task, Flow, Parameter
 from prefect.executors import LocalExecutor
 from prefect.run_configs import KubernetesRun
 from prefect.schedules import CronSchedule
-import base64
+import prefect
 from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
 from prefect.tasks.secrets import PrefectSecret
@@ -49,7 +48,12 @@ def save_ads(ads_list):
 def initiate_harvest(endpoint, token):
     HEADERS = {"accept": "application/json", "Authorization": f"Bearer {token}"}
 
+    logger = prefect.context.get('logger')
+
     last_run = kv_store.get_key_value('last_ads_run')
+
+    logger.info(f"Last run at {last_run}")
+
     endtime = "*"
 
     args = f"size=100&published=%5B{last_run}%2C{endtime}%5D"
@@ -95,14 +99,23 @@ def insert_ads(adsarray, db_table):
 
 @task
 def update_hw(start_time, x):
+    logger = prefect.context.get('logger')
+    logger.info(f"Updating last ads run to {start_time}")
     kv_store.set_key_value('last_ads_run', start_time)
+
+    updated_value = kv_store.get_key_value('last_ads_run')
+    logger.info(f"Last ads run updated to {updated_value}")
+
+@task
+def get_timestamp():
+    return datetime.today().isoformat(timespec='seconds')
 
 
 with Flow("Harvest ads") as flow:
 
     ENDPOINT = 'https://arbeidsplassen.nav.no/public-feed/api/v1/ads'
     TOKEN = PrefectSecret('NAV_TOKEN')
-    start_time = datetime.today().isoformat(timespec='seconds')
+    start_time = get_timestamp()
 
     additional_jobs = initiate_harvest(ENDPOINT, TOKEN)
     additional_results = additional_page.map(additional_jobs)

@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import pymongo
 import time
 import json
@@ -28,6 +29,7 @@ def get_secret(secret_name):
 
 @task
 def save_ads(ads_list):
+    logger = prefect.context.get("logger")
     secret = get_secret("mongodb-connectstring")
     client = pymongo.MongoClient(secret)
     jobsdb = client.jobs
@@ -41,6 +43,7 @@ def save_ads(ads_list):
             insert_attempts += 1
         except Exception as e:
             errors.append({"ad": ad, "error": e})
+            logger.info(f"Failed to save ad. Error: {e}")
     return(insert_attempts, errors)
 
 
@@ -74,13 +77,16 @@ def initiate_harvest(endpoint, token):
 @task
 def additional_page(req):
     sleep(random.random()*10)
-
+    logger = prefect.context.get('logger')
+    
     prepped_req = req.prepare()
     s = requests.Session()
     response = s.send(prepped_req)
     if response.ok:
         ads = json.loads(response.text)
         save_ads.run(ads)
+    else:
+        logger.info(f"Save ad not successful: {response.status_code}")
 
 
 @task

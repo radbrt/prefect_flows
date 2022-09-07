@@ -86,7 +86,8 @@ def additional_page(req):
     response = s.send(prepped_req)
     if response.ok:
         ads = json.loads(response.text)
-        save_ads.run(ads)
+        ads_content = ads["content"]
+        save_ads.run(ads_content)
     else:
         logger.info(f"Save ad not successful: {response.status_code}")
 

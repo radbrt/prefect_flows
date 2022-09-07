@@ -28,8 +28,7 @@ def run_el():
     )
     s.run(env={
             "TAP_SFTP_PASSWORD": tap_sftp_config["TAP_SFTP_PASSWORD"],
-            "TAP_SFTP_USERNAME": tap_sftp_config["TAP_SFTP_USERNAME"],
-            "TAP_SFTP_HOST": tap_sftp_config["TAP_SFTP_HOST"],
+            "TAP_SFTP_USERNAME": tap_sftp_config["TAP_SFTP_USERNAME"]
             "MELTANO_DATABASE_URI": meltano_database_uri,
             "TARGET_SNOWFLAKE_PASSWORD": target_snowflake_config["password"],
             "TARGET_SNOWFLAKE_USERNAME": target_snowflake_config["user"],

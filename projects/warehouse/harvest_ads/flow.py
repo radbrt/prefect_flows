@@ -33,13 +33,14 @@ def save_ads(ads_list):
     secret = get_secret("mongodb-connectstring")
     client = pymongo.MongoClient(secret)
     jobsdb = client.jobs
+    adscollection = jobsdb.ads
 
     errors = []
     insert_attempts = 0
     for ad in ads_list:
         try:
             time.sleep(0.01)
-            jobsdb.insert_one(ad)
+            adscollection.insert_one(ad)
             insert_attempts += 1
         except Exception as e:
             errors.append({"ad": ad, "error": e})

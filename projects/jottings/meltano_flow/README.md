@@ -29,3 +29,5 @@ The Prefect Secrets look as follow:
     "password": "<super-secret-password-2>"
 }
 ```
+
+PS: The tap-sftp is installed manually for now, and cloned from pip when the image is built. This is subject to change.

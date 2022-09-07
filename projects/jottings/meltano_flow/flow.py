@@ -9,14 +9,10 @@ import prefect
 
 @task
 def run_el():
-    logger = prefect.context.get("logger")
-
 
     tap_sftp_config = PrefectSecret("TAP_SFTP_CONFIG").run()
     meltano_database_uri = PrefectSecret("MELTANO_DATABASE_URI").run()
     target_snowflake_config = PrefectSecret("TARGET_SNOWFLAKE_CONFIG").run()
-    logger.info(tap_sftp_config.keys())
-    logger.info(tap_sftp_config["TAP_SFTP_HOST"])
 
     s = ShellTask(
         command="meltano elt tap-sftp target-snowflake",

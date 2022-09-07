@@ -41,3 +41,13 @@ plugins:
   - name: target-jsonl
     variant: andyh1203
     pip_url: target-jsonl
+  - name: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
+    config:
+      dbname: dbthouse
+      user: radrun
+      warehouse: COMPUTE_WH
+      file_format: dbthouse.develop.meltano_csv
+      role: dbt
+      default_target_schema: DEVELOP

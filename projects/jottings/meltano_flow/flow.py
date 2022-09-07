@@ -13,13 +13,13 @@ def run_el():
 
 
     tap_sftp_config = PrefectSecret("TAP_SFTP_CONFIG").run()
-
+    meltano_database_uri = PrefectSecret("MELTANO_DATABASE_URI").run()
+    target_snowflake_config = PrefectSecret("TARGET_SNOWFLAKE_CONFIG").run()
     logger.info(tap_sftp_config.keys())
     logger.info(tap_sftp_config["TAP_SFTP_HOST"])
 
     s = ShellTask(
-        command="meltano elt tap-sftp target-jsonl",
-        # command="echo $TAP_SFTP_HOST",
+        command="meltano elt tap-sftp target-snowflake",
         helper_script="cd /el", 
         shell="bash", 
         return_all=True, 
@@ -30,7 +30,10 @@ def run_el():
             "TAP_SFTP_PASSWORD": tap_sftp_config["TAP_SFTP_PASSWORD"],
             "TAP_SFTP_USERNAME": tap_sftp_config["TAP_SFTP_USERNAME"],
             "TAP_SFTP_HOST": tap_sftp_config["TAP_SFTP_HOST"],
-            # "MELTANO_DATABASE_URI": PrefectSecret("MELTANO_DATABASE_URI").run(),
+            "MELTANO_DATABASE_URI": meltano_database_uri,
+            "TARGET_SNOWFLAKE_PASSWORD": target_snowflake_config["password"],
+            "TARGET_SNOWFLAKE_USERNAME": target_snowflake_config["username"],
+            "TARGET_SNOWFLAKE_ACCOUNT": target_snowflake_config["account"],
             })
 
 

@@ -32,7 +32,7 @@ def run_el():
             "TAP_SFTP_HOST": tap_sftp_config["TAP_SFTP_HOST"],
             "MELTANO_DATABASE_URI": meltano_database_uri,
             "TARGET_SNOWFLAKE_PASSWORD": target_snowflake_config["password"],
-            "TARGET_SNOWFLAKE_USERNAME": target_snowflake_config["username"],
+            "TARGET_SNOWFLAKE_USERNAME": target_snowflake_config["user"],
             "TARGET_SNOWFLAKE_ACCOUNT": target_snowflake_config["account"],
             })
 

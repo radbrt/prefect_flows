@@ -15,7 +15,7 @@ def run_el():
     target_snowflake_config = PrefectSecret("TARGET_SNOWFLAKE_CONFIG").run()
 
     s = ShellTask(
-        command="meltano elt tap-sftp target-snowflake",
+        command="meltano elt tap-sftp target-snowflake --full-refresh",
         helper_script="cd /el", 
         shell="bash", 
         return_all=True, 

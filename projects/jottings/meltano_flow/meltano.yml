@@ -51,3 +51,4 @@ plugins:
       file_format: dbthouse.develop.meltano_csv
       role: dbt
       default_target_schema: DEVELOP
+      add_metadata_columns: true

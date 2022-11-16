@@ -8,7 +8,6 @@ RUN pip install meltano
 
 WORKDIR /el
 COPY meltano.yml .
-RUN git clone https://github.com/radbrry/tap-sftp.git
 
 RUN meltano install
 

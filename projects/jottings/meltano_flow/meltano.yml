@@ -10,7 +10,7 @@ plugins:
   # Insert a new entry:
   - name: tap-sftp
     namespace: tap_sftp
-    pip_url: -e ./tap-sftp
+    pip_url: git+https://github.com/radbrt/tap-sftp.git
     executable: tap-sftp
     capabilities:
       # For a reference of plugin capabilities, see:

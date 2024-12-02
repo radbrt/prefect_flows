@@ -1,0 +1,27 @@
+version: 1
+default_environment: dev
+environments:
+- name: dev
+- name: staging
+- name: prod
+project_id: 96c9c843-b3fd-44aa-bd6d-cd85306f0df2
+plugins:
+  extractors:
+  # Insert a new entry:
+  - name: tap-mongodb
+    config:
+      host:
+      auth_database:
+      database:
+      srv: true
+  loaders:
+  - name: target-snowflake
+    variant: transferwise
+    pip_url: pipelinewise-target-snowflake
+    config:
+      dbname: dbthouse
+      user: radrun
+      warehouse: COMPUTE_WH
+      file_format: dbthouse.develop.meltano_csv
+      role: dbt
+      default_target_schema: DEVELOP
